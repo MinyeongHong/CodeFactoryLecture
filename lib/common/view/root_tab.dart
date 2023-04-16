@@ -1,5 +1,6 @@
 import 'package:api_example/common/const/colors.dart';
 import 'package:api_example/common/layout/default_layout.dart';
+import 'package:api_example/restaurant/view/restaurant_screen.dart';
 import 'package:flutter/material.dart';
 
 class RootTab extends StatefulWidget {
@@ -43,9 +44,7 @@ class _RootTabState extends State<RootTab>
         physics: NeverScrollableScrollPhysics(),
         controller:controller,
         children: [
-          Container(
-            child: Text("홈"),
-          ),
+          RestaurantScreen(),
           Container(
             child: Text("음식"),
           ),
