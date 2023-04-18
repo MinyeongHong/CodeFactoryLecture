@@ -1,3 +1,5 @@
+import 'package:api_example/common/model/cursor_pagination_model.dart';
+import 'package:api_example/restaurant/model/restaurant_model.dart';
 import 'package:dio/dio.dart' hide Headers;
 import 'package:retrofit/http.dart';
 
@@ -15,9 +17,7 @@ abstract class RestaurantRepository {
   @Headers({
     'aceessToken' : 'true '
   })
-  paginate() {
-
-  }
+  Future<CursorPagination<RestaurantModel>> paginate();
 
   @GET('/{id}')
   @Headers({
