@@ -39,6 +39,7 @@ dependencies:
   flutter_secure_storage: ^8.0.0
   json_annotation: ^4.8.0
   retrofit: ^4.0.1
+  flutter_riverpod: ^2.3.5
   logger: any
 
 dev_dependencies:

@@ -1,23 +1,30 @@
 import 'package:api_example/common/const/colors.dart';
 import 'package:api_example/common/layout/default_layout.dart';
+import 'package:api_example/common/secure_storage/secure_storage.dart';
 import 'package:api_example/common/view/root_tab.dart';
 import 'package:api_example/user/view/login_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../const/data.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+
+  late final FlutterSecureStorage storage;
+
   @override
   void initState() {
     super.initState();
+    storage = ref.watch(secureStorageProvider);
 
     checkToken();
   }
