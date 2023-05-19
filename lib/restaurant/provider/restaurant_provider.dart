@@ -30,9 +30,8 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
     bool forceRefetch = false, //true면 CursorPaginationLoading()
   }) async {
     try {
-      final resp = await repository.paginate();
-      state = resp;
       //state의 다섯가지 상태
+
       // 1. CursorPagination - 정상적으로 데이터가 있을 때
 
       // 2. CursorPaginationLoading - 데이터가 로딩중 (현재 캐시없음)
@@ -48,13 +47,12 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
       // 로딩 중 fetchMore = true
       // fetchMore = false -> 새로고침의 의도
 
+      //정상 페이지네이션 상태
       if (state is CursorPagination && !forceRefetch) {
-        //정상 페이지네이션 상태
         final pState = state as CursorPagination;
 
         if (!pState.meta.hasMore) {
-          //no more data
-          return;
+          return; //no more data, 요청하지 않음
         }
       }
 
@@ -71,48 +69,57 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
         count: fetchCount,
       );
 
-      //fetch more : To get more additional data
+      //데이터를 추가로 가져오는 상황
       if (fetchMore) {
-        final pState = state as CursorPagination;
+        final pState = state as CursorPagination; //조심해서 사용
 
         state = CursorPaginationFetchingMore(
           meta: pState.meta,
           data: pState.data,
-        );
+        ); //meta와 data는 유지하고, 상태만 변경할 수 있다. 일단 상태 먼저 변경해서 ui상에서 로딩 효과를 나타내거나 할 수 있음.
 
         paginationParams = paginationParams.copyWith(
           after: pState.data.last.id,
-        );
+        ); //after에 마지막 데이터의 아이디를 넣어준다.
+      }
 
-        final resp = await repository.paginate(
-          paginationParams: paginationParams,
-        );
-
-        if (state is CursorPaginationFetchingMore) {
-          final pState = state as CursorPaginationFetchingMore;
-
-          //기존 데이터에 새 데이터 추가
-          state = resp.copyWith(data: [
-            ...pState.data,
-            ...resp.data,
-          ]);
-        } else {
-          state = resp;
-        }
-      } else {
-        //만약 데이터가 있는 상황이라면 기존 데이터를 보존한 채로 fetch 요청을 진행
+      //데이터를 처음부터 가져오는 상황
+      else {
+        //만약 데이터가 있는 상황이라면 기존 데이터를 보존한 채로 fetch(api 요청)을 진행
         if (state is CursorPagination && !forceRefetch) {
+          //forceRefetch는 처음부터 불러오는 명령이기 때문에 해당 상황에서는 false여야 한다.
           final pState = state as CursorPagination;
+
           state = CursorPaginationRefetching(
             meta: pState.meta,
             data: pState.data,
           );
-        } else {
+        }
+        //나머지 상황
+        else {
           state = CursorPaginationLoading();
         }
       }
+
+      final resp = await repository.paginate(
+        paginationParams: paginationParams,
+      ); // 데이터 요청하기
+
+      if (state is CursorPaginationFetchingMore) {
+        final pState = state as CursorPaginationFetchingMore;
+
+        //기존 데이터에 새 데이터 추가
+        state = resp.copyWith(data: [
+          ...pState.data,
+          ...resp.data,
+        ]);
+      } else {
+        //CursorPaginationFetchingMore이 아닌 상황 => loading or refetching 상황 => 그냥 resp넣기, 가장 처음 페이지에 대한 응답값이므로
+        state = resp;
+      }
     } catch (e) {
-      state = CursorPaginationError(message: 'load failed');
+      //에러 상황
+      state = CursorPaginationError(message: '데이터를 가져오지 못했습니다.');
     }
   }
 }
