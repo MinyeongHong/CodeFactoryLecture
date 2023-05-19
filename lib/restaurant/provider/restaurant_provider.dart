@@ -5,6 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../repository/restaurant_repository.dart';
 
+final restaurantDetailProvider =
+    Provider.family<RestaurantModel?, String>((ref, id) {
+  final state = ref.watch(restaurantProvider);
+
+  if (state is! CursorPagination) {
+    //CursorPagination이 아니다 = 데이터가 없다
+    return null;
+  }
+
+  return state.data.firstWhere((element) => element.id == id);
+});
+
 final restaurantProvider =
     StateNotifierProvider<RestaurantStateNotifier, CursorPaginationBase>((ref) {
   final repository = ref.watch(restaurantRepositoryProvider);
@@ -22,7 +34,7 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
     paginate();
   }
 
-  void paginate({
+  Future<void> paginate({
     int fetchCount = 20,
 
     //fetchMore는 기존 데이터를 보여주며 가져오고, forceRefetch는 그냥 페이지 전체 로딩
@@ -121,5 +133,33 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
       //에러 상황
       state = CursorPaginationError(message: '데이터를 가져오지 못했습니다.');
     }
+  }
+
+  void getDetail({
+    required String id,
+  }) async {
+    if (state is! CursorPagination) {
+      //데이터가 하나도 없을 때 (CursorPagination==false)
+      await paginate(); //데이터를 가져오는 시도를 한다
+    }
+
+    //pagination 이후에도 데이터가 없다면 -> 서버상의 오류라던지.. 여기서 할 수 있는 게 없음 그냥 리턴
+    if (state is! CursorPagination) {
+      return;
+    }
+
+    //예외상황 이후 진짜 로직 시작
+    final pState = state as CursorPagination;
+    final resp = await repository.getRestaurantDetail(id: id);
+    // id값에 해당하는 데이터를 pstate에서 찾고, resp에 넣어야 한다
+
+    state = pState.copyWith(
+      data: pState.data
+          .map<RestaurantModel>(
+            (e) => e.id == id ? resp : e,
+          )
+          .toList(),
+    ); //위의 과정에서 요청한 데이터만 resp로 변경됨
+
   }
 }
