@@ -55,7 +55,7 @@ class CursorPaginationMeta {
 
 //새로고침
 //이미 리스트가 존재하는 상태이므로 CursorPagination을 상속받음
-class CursorPaginationRefetching extends CursorPagination {
+class CursorPaginationRefetching<T> extends CursorPagination<T> {
   CursorPaginationRefetching({
     required super.meta,
     required super.data,
@@ -63,7 +63,7 @@ class CursorPaginationRefetching extends CursorPagination {
 }
 
 //리스트의 맨 아래에서 추가 데이터 요청
-class CursorPaginationFetchingMore extends CursorPagination {
+class CursorPaginationFetchingMore<T> extends CursorPagination<T> {
   CursorPaginationFetchingMore({
     required super.meta,
     required super.data,

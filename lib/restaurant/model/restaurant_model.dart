@@ -1,3 +1,4 @@
+import 'package:api_example/common/model/model_with_id.dart';
 import 'package:api_example/common/utils/data_utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -12,7 +13,7 @@ enum RestaurantPriceRange {
 }
 
 @JsonSerializable()
-class RestaurantModel {
+class RestaurantModel implements IModelWithId{
   final String id;
   final String name;
   @JsonKey(
