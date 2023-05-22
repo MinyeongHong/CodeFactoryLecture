@@ -53,6 +53,7 @@ class ProductCard extends StatelessWidget {
                 Text(
                   detail,
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 6,
                   style: TextStyle(
                     color: BODY_TEXT_COLOR,
                     fontSize: 14,

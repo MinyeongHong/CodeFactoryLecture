@@ -1,6 +1,7 @@
 import 'package:api_example/common/dio/dio.dart';
 import 'package:api_example/common/layout/default_layout.dart';
 import 'package:api_example/product/component/product_card.dart';
+import 'package:api_example/rating/component/rating_card.dart';
 import 'package:api_example/restaurant/component/restaurant_card.dart';
 import 'package:api_example/restaurant/model/restaurant_detail_model.dart';
 import 'package:api_example/restaurant/provider/restaurant_provider.dart';
@@ -50,7 +51,25 @@ class _RestaurantDetailScreenState
           renderTop(model: state),
           if (state is! RestaurantDetailModel) renderLoading(),
           if (state is RestaurantDetailModel) renderLabel(),
-          if (state is RestaurantDetailModel) renderProducts(products: state.products),
+          if (state is RestaurantDetailModel)
+            renderProducts(
+              products: state.products,
+            ),
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            sliver: SliverToBoxAdapter(
+              child: RatingCard(
+                rating: 4,
+                email: 'jc@codefactory.ai',
+                content: '맛있어요',
+                avatarImage: AssetImage(
+                  'asset/img/logo/codefactory_logo.png'
+                ),
+                images: [],
+
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -59,7 +78,7 @@ class _RestaurantDetailScreenState
   SliverPadding renderLoading() {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
+        horizontal: 16.0,
         vertical: 16.0,
       ),
       sliver: SliverList(
@@ -70,9 +89,7 @@ class _RestaurantDetailScreenState
               padding: const EdgeInsets.only(bottom: 32.0),
               child: SkeletonParagraph(
                 style: const SkeletonParagraphStyle(
-                  lines: 5,
-                  padding: EdgeInsets.zero
-                ),
+                    lines: 5, padding: EdgeInsets.zero),
               ),
             ),
           ),
